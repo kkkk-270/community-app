@@ -26,6 +26,7 @@ const WriteScreen = () => {
   const [selectedCategory, setSelectedCategory] = useState(categories[0]);
   const [imageUris, setImageUris] = useState<string[]>([]);
 
+  // 이미지 여러 장 선택
   const pickImages = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       quality: 1,
@@ -44,10 +45,12 @@ const WriteScreen = () => {
     }
   };
 
+  // 이미지 제거
   const removeImage = (index: number) => {
     setImageUris(prev => prev.filter((_, i) => i !== index));
   };
 
+  // 게시물 업로드
   const handleSubmit = async () => {
     try {
       const post = {
@@ -59,10 +62,11 @@ const WriteScreen = () => {
         imageUrls: imageUris,
       };
 
-      const docRef = await addDoc(collection(db, 'posts'), post);
+      await addDoc(collection(db, 'posts'), post);
       navigation.navigate('Home');
     } catch (e) {
-      console.error('❌ 예외 발생:', e);
+      console.error('게시글 업로드 오류:', e);
+      Alert.alert('오류', '게시글을 등록하는 중 문제가 발생했습니다.');
     }
   };
 
@@ -71,6 +75,7 @@ const WriteScreen = () => {
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <Text style={styles.header}>{'< 글쓰기'}</Text>
 
+        {/* 카테고리 선택 */}
         <View style={styles.categoryContainer}>
           {categories.map((cat) => (
             <TouchableOpacity
@@ -93,6 +98,7 @@ const WriteScreen = () => {
           ))}
         </View>
 
+        {/* 제목 입력 */}
         <TextInput
           placeholder="제목"
           value={title}
@@ -101,6 +107,7 @@ const WriteScreen = () => {
           placeholderTextColor="#aaa"
         />
 
+        {/* 내용 입력 */}
         <TextInput
           placeholder="내용을 입력해주세요"
           value={content}
@@ -110,6 +117,7 @@ const WriteScreen = () => {
           multiline
         />
 
+        {/* 이미지 업로드 */}
         <Text style={styles.sectionLabel}>대표 이미지</Text>
         <View style={styles.imageSection}>
           <ScrollView horizontal>
@@ -134,6 +142,7 @@ const WriteScreen = () => {
         </View>
       </ScrollView>
 
+      {/* 등록 버튼 */}
       <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit}>
         <Text style={styles.submitText}>작성 완료</Text>
       </TouchableOpacity>
@@ -146,21 +155,100 @@ export default WriteScreen;
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#1E1E1E' },
   scrollContainer: { padding: 16 },
-  header: { fontSize: 18, color: '#FF8A3D', marginBottom: 20 , marginTop:30},
-  categoryContainer: { flexDirection: 'row', gap: 10, marginBottom: 16 },
-  categoryBtn: { paddingVertical: 6, paddingHorizontal: 12, borderRadius: 20, backgroundColor: '#333' },
-  categoryBtnSelected: { backgroundColor: '#FF8A3D' },
-  categoryText: { color: '#aaa', fontSize: 14 },
-  categoryTextSelected: { color: '#fff', fontWeight: '600' },
-  inputTitle: { borderBottomWidth: 1, borderBottomColor: '#444', color: '#fff', fontSize: 16, paddingVertical: 8, marginBottom: 16 },
-  inputContent: { backgroundColor: '#2C2C2C', borderRadius: 8, padding: 12, fontSize: 15, color: '#fff', height: 180, textAlignVertical: 'top', marginBottom: 24 },
-  sectionLabel: { color: '#fff', marginBottom: 8, fontSize: 14, fontWeight: '600' },
-  imageSection: { flexDirection: 'row', gap: 12, marginBottom: 30 },
-  imageUploadBox: { width: 80, height: 80, backgroundColor: '#2A2A2A', borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
-  imageCount: { color: '#888', fontSize: 12, marginTop: 4 },
-  imagePreviewWrapper: { position: 'relative', marginRight: 8 },
-  imagePreview: { width: 80, height: 80, borderRadius: 8 },
-  removeIcon: { position: 'absolute', top: -8, right: -8, backgroundColor: '#000', borderRadius: 12 },
-  submitBtn: { backgroundColor: '#FF8A3D', paddingVertical: 16, alignItems: 'center' },
-  submitText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
+  header: {
+    fontSize: 18,
+    color: '#FF8A3D',
+    marginBottom: 20,
+    marginTop: 30,
+  },
+  categoryContainer: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 16,
+  },
+  categoryBtn: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    backgroundColor: '#333',
+  },
+  categoryBtnSelected: {
+    backgroundColor: '#FF8A3D',
+  },
+  categoryText: {
+    color: '#aaa',
+    fontSize: 14,
+  },
+  categoryTextSelected: {
+    color: '#fff',
+    fontWeight: '600',
+  },
+  inputTitle: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#444',
+    color: '#fff',
+    fontSize: 16,
+    paddingVertical: 8,
+    marginBottom: 16,
+  },
+  inputContent: {
+    backgroundColor: '#2C2C2C',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 15,
+    color: '#fff',
+    height: 180,
+    textAlignVertical: 'top',
+    marginBottom: 24,
+  },
+  sectionLabel: {
+    color: '#fff',
+    marginBottom: 8,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  imageSection: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 30,
+  },
+  imageUploadBox: {
+    width: 80,
+    height: 80,
+    backgroundColor: '#2A2A2A',
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  imageCount: {
+    color: '#888',
+    fontSize: 12,
+    marginTop: 4,
+  },
+  imagePreviewWrapper: {
+    position: 'relative',
+    marginRight: 8,
+  },
+  imagePreview: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+  },
+  removeIcon: {
+    position: 'absolute',
+    top: -8,
+    right: -8,
+    backgroundColor: '#000',
+    borderRadius: 12,
+  },
+  submitBtn: {
+    backgroundColor: '#FF8A3D',
+    paddingVertical: 16,
+    alignItems: 'center',
+  },
+  submitText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
 });

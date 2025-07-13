@@ -18,11 +18,11 @@ import { auth, db } from '../firebase/firebaseConfig';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../types/navigation';
+import { MypageStackParamList } from '../types/navigation';
 
 const defaultProfileUri = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
 
-type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Signup'>;
+type NavigationProp = NativeStackNavigationProp<MypageStackParamList, 'Signup'>;
 
 const SignupScreen = () => {
   const navigation = useNavigation<NavigationProp>();
@@ -35,15 +35,18 @@ const SignupScreen = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  // 회원가입 처리 함수
   const handleSignup = async () => {
     if (password !== confirmPassword) {
       Alert.alert('오류', '비밀번호가 일치하지 않습니다.');
       return;
     }
     try {
+      // Firebase Authentication으로 사용자 생성
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
+      // Firestore에 사용자 정보 저장
       await setDoc(doc(db, 'users', user.uid), {
         email: user.email,
         nickname: nickname,
@@ -59,6 +62,7 @@ const SignupScreen = () => {
     }
   };
 
+  // 이미지 선택 (갤러리에서)
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -71,10 +75,12 @@ const SignupScreen = () => {
     }
   };
 
+  // 기본 이미지로 설정
   const setDefaultImage = () => {
     setProfileImage(defaultProfileUri);
   };
 
+  // 입력 필드 렌더링 (플로팅 라벨 포함)
   const renderFloatingInput = (
     label: string,
     value: string,
@@ -114,12 +120,15 @@ const SignupScreen = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.container}
       >
+        {/* 뒤로가기 버튼 */}
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Text style={styles.backButton}>{'< 뒤로가기'}</Text>
         </TouchableOpacity>
 
+        {/* 타이틀 */}
         <Text style={styles.title}>회원가입</Text>
 
+        {/* 프로필 이미지 선택 */}
         <View style={styles.imagePickerContainer}>
           <TouchableOpacity onPress={pickImage} style={styles.imagePicker}>
             <Image
@@ -133,34 +142,19 @@ const SignupScreen = () => {
           </TouchableOpacity>
         </View>
 
+        {/* 입력 폼 영역 */}
         <View style={styles.form}>
           {renderFloatingInput('닉네임', nickname, setNickname, 'nickname')}
           {renderFloatingInput('이메일', email, setEmail, 'email', false, 'email-address')}
-          {renderFloatingInput(
-            '비밀번호',
-            password,
-            setPassword,
-            'password',
-            !showPassword,
-            'default',
-            true,
-            () => setShowPassword(prev => !prev)
-          )}
-          {renderFloatingInput(
-            '비밀번호 확인',
-            confirmPassword,
-            setConfirmPassword,
-            'confirmPassword',
-            !showConfirmPassword,
-            'default',
-            true,
-            () => setShowConfirmPassword(prev => !prev)
-          )}
+          {renderFloatingInput('비밀번호', password, setPassword, 'password', !showPassword, 'default', true, () => setShowPassword(prev => !prev))}
+          {renderFloatingInput('비밀번호 확인', confirmPassword, setConfirmPassword, 'confirmPassword', !showConfirmPassword, 'default', true, () => setShowConfirmPassword(prev => !prev))}
 
+          {/* 회원가입 버튼 */}
           <TouchableOpacity onPress={handleSignup} style={styles.button}>
             <Text style={styles.buttonText}>회원가입</Text>
           </TouchableOpacity>
 
+          {/* 로그인 화면으로 이동 링크 */}
           <TouchableOpacity onPress={() => navigation.navigate('Login')}>
             <Text style={styles.link}>
               이미 계정이 있으신가요? <Text style={styles.linkHighlight}>로그인</Text>

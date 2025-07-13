@@ -15,11 +15,11 @@ import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase/firebaseConfig';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
-import type { RootStackParamList } from '../types/navigation';
+import type { MypageStackParamList } from '../types/navigation';
 
-type EditPostRouteProp = RouteProp<RootStackParamList, 'EditPost'>;
+type EditPostRouteProp = RouteProp<MypageStackParamList, 'EditPost'>;
 
-const categories = ['자유글', '정보보', '질문'];
+const categories = ['자유글', '정보', '질문'];
 
 const EditPostScreen = () => {
   const navigation = useNavigation();
@@ -31,6 +31,7 @@ const EditPostScreen = () => {
   const [selectedCategory, setSelectedCategory] = useState(post.category || categories[0]);
   const [imageUri, setImageUri] = useState(post.imageUrls?.[0] || null);
 
+  // 이미지 선택 (갤러리에서 1장)
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       quality: 1,
@@ -42,8 +43,10 @@ const EditPostScreen = () => {
     }
   };
 
+  // 이미지 제거
   const removeImage = () => setImageUri(null);
 
+  // 게시글 수정 핸들러
   const handleUpdate = async () => {
     if (!title.trim() || !content.trim()) {
       Alert.alert('오류', '제목과 내용을 모두 입력해주세요.');
@@ -72,23 +75,19 @@ const EditPostScreen = () => {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
+        {/* 상단 타이틀 */}
         <Text style={styles.header}>{'< 글 수정'}</Text>
 
+        {/* 카테고리 선택 버튼 */}
         <View style={styles.categoryContainer}>
           {categories.map((cat) => (
             <TouchableOpacity
               key={cat}
-              style={[
-                styles.categoryBtn,
-                selectedCategory === cat && styles.categoryBtnSelected,
-              ]}
+              style={[styles.categoryBtn, selectedCategory === cat && styles.categoryBtnSelected]}
               onPress={() => setSelectedCategory(cat)}
             >
               <Text
-                style={[
-                  styles.categoryText,
-                  selectedCategory === cat && styles.categoryTextSelected,
-                ]}
+                style={[styles.categoryText, selectedCategory === cat && styles.categoryTextSelected]}
               >
                 {cat}
               </Text>
@@ -96,6 +95,7 @@ const EditPostScreen = () => {
           ))}
         </View>
 
+        {/* 제목 입력 */}
         <TextInput
           placeholder="제목"
           value={title}
@@ -104,6 +104,7 @@ const EditPostScreen = () => {
           placeholderTextColor="#aaa"
         />
 
+        {/* 본문 입력 */}
         <TextInput
           placeholder="내용을 입력해주세요"
           value={content}
@@ -113,6 +114,7 @@ const EditPostScreen = () => {
           multiline
         />
 
+        {/* 이미지 업로드 */}
         <Text style={styles.sectionLabel}>대표 이미지</Text>
         <View style={styles.imageSection}>
           {!imageUri ? (
@@ -132,6 +134,7 @@ const EditPostScreen = () => {
         </View>
       </ScrollView>
 
+      {/* 하단 수정 버튼 */}
       <TouchableOpacity style={styles.submitBtn} onPress={handleUpdate}>
         <Text style={styles.submitText}>수정 완료</Text>
       </TouchableOpacity>
@@ -141,6 +144,7 @@ const EditPostScreen = () => {
 
 export default EditPostScreen;
 
+// 스타일 정의
 const styles = StyleSheet.create({
   container: {
     flex: 1,

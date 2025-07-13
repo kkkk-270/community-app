@@ -1,4 +1,5 @@
-// DetailScreen.tsx
+// 게시글 상세 화면 - 게시글 이미지, 내용, 댓글 목록 및 작성/수정/삭제 기능 포함
+
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -18,6 +19,7 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { KeyboardAvoidingView } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Entypo } from '@expo/vector-icons';
+
 import { db, auth } from '../firebase/firebaseConfig';
 import {
   collection,
@@ -33,6 +35,7 @@ import {
   getDoc,
   deleteDoc,
 } from 'firebase/firestore';
+
 import type { RootStackParamList } from '../types/navigation';
 
 const screenWidth = Dimensions.get('window').width;
@@ -75,8 +78,7 @@ const DetailScreen = () => {
   }, [post.id]);
 
   const handleAddComment = async () => {
-    if (!newComment.trim()) return;
-    if (!currentUser) return;
+    if (!newComment.trim() || !currentUser) return;
 
     const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
     const nickname = userDoc.exists() ? userDoc.data().nickname : '익명';
@@ -88,7 +90,9 @@ const DetailScreen = () => {
       content: newComment,
       createdAt: serverTimestamp(),
     });
+
     await updateDoc(doc(db, 'posts', post.id), { commentCount: increment(1) });
+
     setNewComment('');
     setIsWriting(false);
   };
@@ -149,7 +153,7 @@ const DetailScreen = () => {
           <View style={styles.postBox}>
             <Text style={styles.title}>{post.title}</Text>
             <Text style={styles.metaText}>
-              {post.nickname || '익명'} · 👁 {post.views || 0} · 💬 {comments.length}
+              {post.nickname || '익명'} · 조회수 {post.views || 0} · 댓글 {comments.length}
             </Text>
             <Text style={styles.content}>{post.content}</Text>
           </View>
@@ -233,87 +237,137 @@ const DetailScreen = () => {
   );
 };
 
+export default DetailScreen;
+
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#1E1E1E' },
-  headerRow: { paddingTop: 20, paddingHorizontal: 16 },
-  backText: { color: '#FF8A3D', fontSize: 16, fontWeight: '600', marginTop: 30 },
-  imageWrapper: { width: '100%', height: 240, backgroundColor: '#444', marginTop: 10 },
-  thumbnail: { width: screenWidth, height: 240, resizeMode: 'cover' },
+  container: {
+    flex: 1,
+    backgroundColor: '#1E1E1E',
+    paddingHorizontal: 16,
+  },
+  headerRow: {
+    paddingVertical: 16,
+  },
+  backText: {
+    color: '#FF8A3D',
+    fontSize: 14,
+  },
+  imageWrapper: {
+    width: '100%',
+    height: 260,
+    borderRadius: 12,
+    overflow: 'hidden',
+    marginBottom: 12,
+  },
+  thumbnail: {
+    width: screenWidth,
+    height: 260,
+    resizeMode: 'cover',
+  },
   imageIndexBadge: {
     position: 'absolute',
-    left: 10,
     bottom: 10,
-    backgroundColor: '#000000aa',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    right: 12,
+    backgroundColor: '#00000080',
     borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
   },
-  imageIndexText: { color: '#fff', fontSize: 12, fontWeight: '600' },
-  postBox: { padding: 16, paddingTop: 12 },
-  title: { fontSize: 20, color: '#fff', fontWeight: 'bold', marginBottom: 6 },
-  metaText: { fontSize: 13, color: '#aaa', marginBottom: 10 },
-  content: { fontSize: 15, color: '#ddd', lineHeight: 22 },
-  divider: { height: 1, backgroundColor: '#444', marginHorizontal: 16, marginVertical: 12 },
+  imageIndexText: {
+    color: '#fff',
+    fontSize: 12,
+  },
+  postBox: {
+    marginBottom: 20,
+  },
+  title: {
+    fontSize: 20,
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  metaText: {
+    fontSize: 12,
+    color: '#aaa',
+    marginTop: 6,
+  },
+  content: {
+    color: '#ddd',
+    fontSize: 15,
+    marginTop: 12,
+    lineHeight: 22,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#444',
+    marginVertical: 20,
+  },
   commentHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    marginBottom: 12,
-  },
-  commentHeader: { fontSize: 16, color: '#fff', fontWeight: '600' },
-  writeButtonText: { color: '#FF8A3D', fontWeight: '600', fontSize: 14 },
-  commentBox: {
-    backgroundColor: '#3B3B3B',
-    borderRadius: 8,
-    padding: 12,
     marginBottom: 10,
-    marginHorizontal: 16,
   },
-  commentAuthor: { color: '#FF8A3D', fontWeight: '600', marginBottom: 4 },
-  commentText: { color: '#ddd', fontSize: 14 },
+  commentHeader: {
+    fontSize: 16,
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  writeButtonText: {
+    color: '#FF8A3D',
+    fontSize: 14,
+  },
+  commentBox: {
+    backgroundColor: '#2E2E2E',
+    padding: 12,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  commentAuthor: {
+    fontSize: 14,
+    color: '#FF8A3D',
+  },
+  commentText: {
+    color: '#ccc',
+    fontSize: 14,
+    marginTop: 4,
+  },
   inputWrapper: {
     flexDirection: 'row',
     padding: 12,
     borderTopWidth: 1,
-    borderTopColor: '#444',
-    backgroundColor: '#2B2B2B',
-    alignItems: 'center',
+    borderColor: '#333',
+    backgroundColor: '#1E1E1E',
   },
   input: {
     flex: 1,
-    backgroundColor: '#3B3B3B',
+    backgroundColor: '#2E2E2E',
     borderRadius: 8,
     paddingHorizontal: 12,
-    paddingVertical: 8,
     color: '#fff',
-    marginRight: 8,
   },
   sendButton: {
-    backgroundColor: '#FF8A3D',
-    borderRadius: 8,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+    marginLeft: 10,
     justifyContent: 'center',
   },
-  sendText: { color: '#fff', fontWeight: '600' },
+  sendText: {
+    color: '#FF8A3D',
+    fontWeight: 'bold',
+  },
   modalOverlay: {
     flex: 1,
-    backgroundColor: '#00000077',
+    backgroundColor: '#00000070',
     justifyContent: 'center',
     alignItems: 'center',
   },
   modalBox: {
-    backgroundColor: '#333',
-    borderRadius: 8,
+    backgroundColor: '#2E2E2E',
     padding: 16,
-    width: 200,
+    borderRadius: 12,
+    width: 160,
   },
   modalItem: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#fff',
-    paddingVertical: 8,
+    paddingVertical: 6,
   },
 });
-
-export default DetailScreen;

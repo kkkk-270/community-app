@@ -23,10 +23,12 @@ import { db, auth } from '../firebase/firebaseConfig';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { MypageStackParamList } from '../types/navigation';
 
+// 마이페이지 - 내가 작성한 글 목록 출력 화면
 const MyPostScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<MypageStackParamList>>();
   const [posts, setPosts] = useState<any[]>([]);
 
+  // 현재 로그인한 사용자의 게시글을 조회하고 최신순으로 정렬하여 실시간 반영
   useEffect(() => {
     const user = auth.currentUser;
     if (!user) return;
@@ -48,6 +50,7 @@ const MyPostScreen = () => {
     return () => unsubscribe();
   }, []);
 
+  // 게시글 삭제 핸들러 (삭제 확인 Alert 포함)
   const handleDelete = (postId: string) => {
     Alert.alert(
       '정말 삭제하시겠어요?',
@@ -61,7 +64,7 @@ const MyPostScreen = () => {
             try {
               await deleteDoc(doc(db, 'posts', postId));
             } catch (err) {
-              console.error('❌ 삭제 오류:', err);
+              console.error('삭제 오류:', err);
             }
           },
         },
@@ -69,6 +72,7 @@ const MyPostScreen = () => {
     );
   };
 
+  // 게시글 카드 렌더링
   const renderPost = ({ item }: any) => (
     <View style={styles.card}>
       <TouchableOpacity
@@ -86,7 +90,7 @@ const MyPostScreen = () => {
             {item.content}
           </Text>
           <Text style={styles.cardFooter}>
-            💬 {item.comments || 0} · 👁 {item.views || 0}
+            댓글 {item.comments || 0} · 조회수 {item.views || 0}
           </Text>
         </View>
       </TouchableOpacity>
@@ -136,7 +140,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     marginBottom: 16,
-    marginTop:30,
+    marginTop: 30,
   },
   card: {
     flexDirection: 'column',

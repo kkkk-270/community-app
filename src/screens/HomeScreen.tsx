@@ -25,6 +25,7 @@ import { db } from '../firebase/firebaseConfig';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { MypageStackParamList } from '../types/navigation';
 
+// 카테고리 필터 목록
 const categories = ['전체', '자유글', '정보', '질문'];
 
 const HomeScreen = () => {
@@ -35,6 +36,7 @@ const HomeScreen = () => {
   const [sortOpen, setSortOpen] = useState(false);
   const sortHeight = useRef(new Animated.Value(44)).current;
 
+  // 게시글 실시간 조회 및 댓글 수, 작성자 닉네임 병합
   useEffect(() => {
     const q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'));
 
@@ -43,6 +45,7 @@ const HomeScreen = () => {
         const data = docSnap.data();
         const id = docSnap.id;
 
+        // 닉네임 조회
         let nickname = '익명';
         try {
           const userSnap = await getDoc(doc(db, 'users', data.authorId));
@@ -50,9 +53,10 @@ const HomeScreen = () => {
             nickname = userSnap.data().nickname || '익명';
           }
         } catch (e) {
-          console.log('❌ 닉네임 불러오기 실패:', e);
+          console.log('닉네임 불러오기 실패:', e);
         }
 
+        // 댓글 수 조회
         let commentCount = 0;
         try {
           const commentQuery = query(
@@ -62,7 +66,7 @@ const HomeScreen = () => {
           const commentSnap = await getDocs(commentQuery);
           commentCount = commentSnap.size;
         } catch (e) {
-          console.log('❌ 댓글 수 조회 실패:', e);
+          console.log('댓글 수 조회 실패:', e);
         }
 
         return {
@@ -80,6 +84,7 @@ const HomeScreen = () => {
     return () => unsubscribe();
   }, []);
 
+  // 정렬 드롭다운 토글
   const toggleSort = () => {
     Animated.timing(sortHeight, {
       toValue: sortOpen ? 44 : 88,
@@ -89,11 +94,13 @@ const HomeScreen = () => {
     setSortOpen(!sortOpen);
   };
 
+  // 정렬 방식 변경
   const handleSortChange = (option: string) => {
     setSelectedSort(option);
     toggleSort();
   };
 
+  // 카테고리 및 정렬 조건에 따른 게시글 필터링
   const filteredPosts = (selectedCategory === '전체'
     ? posts
     : posts.filter((post) => post.category === selectedCategory)
@@ -103,6 +110,7 @@ const HomeScreen = () => {
     return 0;
   });
 
+  // 게시글 렌더링 카드
   const renderPost = ({ item }: any) => (
     <TouchableOpacity
       style={styles.card}
@@ -125,6 +133,7 @@ const HomeScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* 상단 헤더 */}
       <View style={styles.header}>
         <Text style={styles.title}>Community</Text>
         <TouchableOpacity>
@@ -132,6 +141,7 @@ const HomeScreen = () => {
         </TouchableOpacity>
       </View>
 
+      {/* 카테고리 필터 */}
       <View style={styles.categoryContainer}>
         {categories.map((cat) => (
           <TouchableOpacity
@@ -146,6 +156,7 @@ const HomeScreen = () => {
         ))}
       </View>
 
+      {/* 정렬 선택 */}
       <Animated.View style={[styles.sortBox, sortOpen && styles.sortBoxExpanded]}>
         <TouchableOpacity onPress={toggleSort} style={styles.sortOption}>
           <Text style={styles.sortText}>{selectedSort} ▼</Text>
@@ -160,6 +171,7 @@ const HomeScreen = () => {
         )}
       </Animated.View>
 
+      {/* 게시글 리스트 */}
       <FlatList
         data={filteredPosts}
         keyExtractor={(item) => item.id}
@@ -167,6 +179,7 @@ const HomeScreen = () => {
         contentContainerStyle={{ paddingBottom: 120 }}
       />
 
+      {/* 글쓰기 및 새로고침 버튼 */}
       <TouchableOpacity style={styles.floatingButton} onPress={() => navigation.navigate('Write')}>
         <Ionicons name="create-outline" size={24} color="#fff" />
       </TouchableOpacity>
@@ -227,6 +240,9 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
     marginBottom: 12,
     width: 85,
+  },
+  sortBoxExpanded: {
+    height: 88,
   },
   sortOption: {
     paddingVertical: 10,
