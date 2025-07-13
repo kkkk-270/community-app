@@ -3,9 +3,11 @@
 React Native 기반의 커뮤니티 앱입니다.  
 회원가입/로그인, 글 작성 및 목록 조회, 댓글 기능, 마이페이지 등 MVP 기능을 구현했습니다.
 
-<br/>
+---
 
 ## 📁 프로젝트 구조
+
+
 community-app/
 ├── assets/                   # 이미지, 아이콘 등 정적 자산
 │   ├── images/
@@ -58,7 +60,7 @@ community-app/
 └── README.md
 
 
-<br/>
+---
 
 ## 🚀 주요 기능
 
