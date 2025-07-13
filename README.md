@@ -1,4 +1,4 @@
-# 🧡 Community App (React Native + Firebase)
+# Community App (React Native + Firebase)
 
 React Native 기반의 커뮤니티 앱입니다.  
 회원가입/로그인, 글 작성 및 목록 조회, 댓글 기능, 마이페이지 등 MVP 기능을 구현했습니다.
