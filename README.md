@@ -7,31 +7,56 @@ React Native 기반의 커뮤니티 앱입니다.
 
 ## 📁 프로젝트 구조
 community-app/
-├── src/
-│ ├── components/ # 재사용 컴포넌트
-│ │ ├── EditPostScreen.tsx
-│ │ ├── MyCommentScreen.tsx
-│ │ ├── MyPostScreen.tsx
-│ │ ├── ViewPostsScreen.tsx
-│ ├── firebase/ # Firebase 연동
-│ │ └── firebaseConfig.tsx
-│ ├── navigation/ # 네비게이션 설정
-│ │ ├── MainTabNavigation.tsx
-│ │ └── MypageStack.tsx
-│ ├── screens/ # 주요 화면 (스크린)
-│ │ ├── DetailScreen.tsx
-│ │ ├── HomeScreen.tsx
-│ │ ├── LoginScreen.tsx
-│ │ ├── MypageScreen.tsx
-│ │ ├── SignupScreen.tsx
-│ │ └── WriteScreen.tsx
-│ └── types/
-│ └── navigation.ts
-├── App.tsx
-├── app.json
+├── assets/                   # 이미지, 아이콘 등 정적 자산
+│   ├── images/
+│   └── icons/
+│
+├── src/                      # 소스 코드
+│   ├── components/           # 공통 컴포넌트 (재사용 가능)
+│   │   ├── CommentItem.tsx
+│   │   ├── PostCard.tsx
+│   │   └── ...
+│   │
+│   ├── screens/              # 주요 화면 (페이지 단위)
+│   │   ├── HomeScreen.tsx
+│   │   ├── DetailScreen.tsx
+│   │   ├── WriteScreen.tsx
+│   │   ├── LoginScreen.tsx
+│   │   ├── SignupScreen.tsx
+│   │   ├── MypageScreen.tsx
+│   │   ├── MyPostScreen.tsx
+│   │   └── MyCommentScreen.tsx
+│   │
+│   ├── navigation/           # 네비게이션 관련
+│   │   ├── MainTabNavigation.tsx
+│   │   └── MypageStack.tsx
+│   │
+│   ├── firebase/             # Firebase 설정 관련
+│   │   └── firebaseConfig.ts
+│   │
+│   ├── services/             # Firestore 쿼리 함수 등 API 서비스
+│   │   ├── authService.ts
+│   │   ├── postService.ts
+│   │   └── commentService.ts
+│   │
+│   ├── hooks/                # 커스텀 훅 (선택)
+│   │   └── useAuth.ts
+│   │
+│   ├── types/                # 타입 정의
+│   │   └── navigation.ts
+│   │
+│   ├── constants/            # 상수값, 색상, 문자열 등
+│   │   └── theme.ts
+│   │
+│   └── utils/                # 유틸 함수들 (포맷터 등)
+│       └── dateUtils.ts
+│
+├── App.tsx                   # 앱 루트
+├── app.json                  # Expo 설정
 ├── package.json
-├── tsconfig.json
+├── tsconfig.json             # TypeScript 설정
 └── README.md
+
 
 <br/>
 
